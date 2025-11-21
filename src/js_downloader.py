@@ -9,12 +9,22 @@ def response(flow):
 
 	header_sign = "Content-Type"
 
-	if header_sign in headers and headers[header_sign] == "application/x-javascript":
+	if header_sign in headers:
+		match = search(r'application/(x-|)javascript', headers[header_sign])
 
-			# pega apenas o nome do arquivo JavaScript
-			match = search(r'(?<=/)[a-z0-9-_]+.js$', path)
+		if match is not None:
+				# pega apenas o nome do arquivo JavaScript
+				match = search(r'(?<=/)[a-z0-9-_.]+.js$', path)
 
-			if match is not None:
-				with open(match.group(0), "w") as f:
+				if match is not None:
+
+					with open(match.group(0), "w") as f:
+
+						# caso for um JS puro
+						if not "Content-Encoding" in headers:
+							print(flow.response.data.content.decode("utf-8"), file=f)
+							return
+
+						# arquivo comprimido em GZIP
 						descompressed_js = decompress(flow.response.data.content)
 						print(descompressed_js.decode("utf-8"), file=f)
