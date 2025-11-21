@@ -1,0 +1,20 @@
+from re import search
+from gzip import decompress
+
+# Obs: é preciso utilizar o "Match and Replace" do Burp e trocar para "Accept-Encoding: gzip"
+
+def response(flow):
+	headers = flow.response.headers
+	path = flow.request.path
+
+	header_sign = "Content-Type"
+
+	if header_sign in headers and headers[header_sign] == "application/x-javascript":
+
+			# pega apenas o nome do arquivo JavaScript
+			match = search(r'(?<=/)[a-z0-9-_]+.js$', path)
+
+			if match is not None:
+				with open(match.group(0), "w") as f:
+						descompressed_js = decompress(flow.response.data.content)
+						print(descompressed_js.decode("utf-8"), file=f)
