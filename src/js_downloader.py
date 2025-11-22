@@ -1,6 +1,8 @@
 from re import search
 from gzip import decompress as gzip_decompress
 from brotli import decompress as br_decompress
+from os.path import exists
+from os import mkdir
 
 # Obs: é preciso utilizar o "Match and Replace" do Burp e trocar para "Accept-Encoding: gzip"
 
@@ -20,7 +22,15 @@ def response(flow):
 
             if match is not None:
 
-                with open(match.group(0), "w") as f:
+                if not exists("js"):
+                    mkdir("js")
+
+                filename = "js/" + match.group(0)
+
+                if exists(filename):
+                    return
+
+                with open(filename, "w") as f:
 
                     # caso for um JS puro
                     if not "Content-Encoding" in headers:
