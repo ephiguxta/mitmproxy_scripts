@@ -10,11 +10,11 @@ def response(flow):
 	header_sign = "Content-Type"
 
 	if header_sign in headers:
-		match = search(r'application/(x-|)javascript', headers[header_sign])
+		match = search(r'(text|application)/(x-|)javascript', headers[header_sign])
 
 		if match is not None:
 				# pega apenas o nome do arquivo JavaScript
-				match = search(r'(?<=/)[a-z0-9-_.]+.js$', path)
+				match = search(r'(?<=/)[a-z0-9-_.]+.js($|((?=?))', path)
 
 				if match is not None:
 
