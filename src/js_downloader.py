@@ -1,5 +1,6 @@
 from re import search
-from gzip import decompress
+from gzip import decompress as gzip_decompress
+from brotli import decompress as br_decompress
 
 # Obs: é preciso utilizar o "Match and Replace" do Burp e trocar para "Accept-Encoding: gzip"
 
@@ -20,11 +21,23 @@ def response(flow):
 
 					with open(match.group(0), "w") as f:
 
+
 						# caso for um JS puro
 						if not "Content-Encoding" in headers:
 							print(flow.response.data.content.decode("utf-8"), file=f)
 							return
 
-						# arquivo comprimido em GZIP
-						descompressed_js = decompress(flow.response.data.content)
-						print(descompressed_js.decode("utf-8"), file=f)
+						content_encoding = headers["Content-Encoding"]
+
+						# caso haja compressão no arquivo, seja ele gzip ou br...
+						# descomprime e joga pro arquivo local
+
+						if content_encoding == "gzip":
+							# arquivo comprimido em GZIP
+							decompressed_js = gzip_decompress(flow.response.data.content)
+
+						elif content_encoding == "br":
+							# arquivo comprimido em Brotli
+							decompressed_js = br_decompress(flow.response.data.content)
+
+						print(decompressed_js.decode("utf-8"), file=f)
