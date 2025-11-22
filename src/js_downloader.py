@@ -14,7 +14,7 @@ def response(flow):
 
 		if match is not None:
 				# pega apenas o nome do arquivo JavaScript
-				match = search(r'(?<=/)[a-z0-9-_.]+.js($|((?=?))', path)
+				match = search(r'(?<=/)[a-z0-9-_.]+.js($|(?=\?))', path)
 
 				if match is not None:
 
